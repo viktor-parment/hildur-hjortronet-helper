@@ -72,8 +72,8 @@ type View = "welcome" | "services" | "security" | "infra";
 const copy = {
   sv: {
     nav: ["Välkommen", "Gästtjänster", "Trygghet & säkerhet", "Drift & infrastruktur"],
-    hello: "Buerie båeteme — och varmt välkommen.",
-    intro: "Jag är Hildur 4.0. Fråga mig om fjället, boka bastun eller beställ frukost. Jag rimmar inte längre och har slutat starta om mitt i en mening.",
+    hello: "Buerie båeteme.",
+    intro: "Hej! Jag är Hildur 4.0. Fråga mig om fjället, boka bastun eller beställ frukost. Jag rimmar inte längre och har slutat starta om mitt i en mening.",
     ask: "Vad kan jag hjälpa dig med?",
     weather: "Vädret i Hemavan",
     aurora: "Norrskenslarm",
@@ -90,8 +90,8 @@ const copy = {
   },
   en: {
     nav: ["Welcome", "Guest services", "Safety & security", "Operations & infrastructure"],
-    hello: "Buerie båeteme — and a warm welcome.",
-    intro: "I'm Hildur 4.0. Ask me about the mountain, book the sauna or order breakfast. I no longer rhyme or reboot mid-sentence.",
+    hello: "Buerie båeteme.",
+    intro: "Hi! I'm Hildur 4.0. Ask me about the mountain, book the sauna or order breakfast. I no longer rhyme or reboot mid-sentence.",
     ask: "How can I help?",
     weather: "Weather in Hemavan",
     aurora: "Northern Lights alert",
@@ -404,7 +404,13 @@ function BreakfastForm({ room, setRoom }: { room: string; setRoom: (s: string) =
 }
 
 function IssueForm({ room, setRoom, issue, setIssue }: { room: string; setRoom: (s: string) => void; issue: string; setIssue: (s: string) => void }) {
-  return <div><FormTitle icon={HeartPulse} title="Hur kan vi hjälpa?" text="Akuta situationer: ring 112. Hildur meddelar receptionen direkt." /><div><Label htmlFor="room-issue">Rumsnummer</Label><Input id="room-issue" value={room} onChange={(e) => setRoom(e.target.value)} className="mt-2" placeholder="Till exempel 204" /></div><div className="mt-5"><Label htmlFor="issue">Beskriv problemet</Label><Textarea id="issue" value={issue} onChange={(e) => setIssue(e.target.value)} className="mt-2 min-h-28" placeholder="Till exempel: elementet är kallt..." /></div></div>;
+  const [kjellPetted, setKjellPetted] = useState(false);
+  const petKjell = () => {
+    if (kjellPetted) return;
+    setKjellPetted(true);
+    toast.success("Kjell spinner", { description: "Terapeuten har gjort sitt. Känns det redan lite bättre?" });
+  };
+  return <div><FormTitle icon={HeartPulse} title="Hur kan vi hjälpa?" text="Akuta situationer: ring 112. Hildur meddelar receptionen direkt." /><div><Label htmlFor="room-issue">Rumsnummer</Label><Input id="room-issue" value={room} onChange={(e) => setRoom(e.target.value)} className="mt-2" placeholder="Till exempel 204" /></div><div className="mt-5"><Label htmlFor="issue">Beskriv problemet</Label><Textarea id="issue" value={issue} onChange={(e) => setIssue(e.target.value)} className="mt-2 min-h-28" placeholder="Till exempel: elementet är kallt..." /></div><div className="mt-6 flex items-center gap-4 border border-gold/50 bg-gold-soft p-4"><img src={kjellPortrait} alt="Kjell, hotellterapeuten, redo att bli klappad" width={1200} height={912} loading="lazy" className="size-20 shrink-0 border-2 border-gold object-cover" /><div className="min-w-0"><p className="font-display text-xl text-gold-deep">Klappa Kjell så kanske det känns bättre</p><Button variant={kjellPetted ? "outline" : "default"} className="mt-3" onClick={petKjell} disabled={kjellPetted}><Hand />{kjellPetted ? "Klappt och klart" : "Klappa Kjell"}</Button></div></div></div>;
 }
 
 function FormTitle({ icon: Icon, title, text }: { icon: typeof Flame; title: string; text: string }) {
@@ -417,7 +423,7 @@ function Security({ t }: { t: Copy }) {
     { icon: Cat, number: "02", title: "Kjell har bytt karriär", text: "Vakt, skadedjursbekämpare, f.d. systemadmin, terapeut och bastubevakare. Han misstänks även vara en del av fjällmaffian.", old: "Ingen tonfisk, ingen bastu." },
     { icon: LockKeyhole, number: "03", title: "Gästdata är krypterad", text: "Information är skyddad både när den skickas och när den lagras.", old: "Ingen mer gästbok.txt på skrivbordet." },
   ];
-  return <div className="mx-auto max-w-[1200px] px-4 py-10 md:px-8 md:py-16"><SectionHeading eyebrow="Trygghetslöftet" title={t.securityTitle} text={t.securityIntro} /><div className="mb-7 flex flex-wrap items-center justify-between gap-4 border-y border-border py-5"><div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-full bg-success-soft text-success"><ShieldCheck /></span><div><strong className="block">Alla system skyddade</strong><small className="text-muted-foreground">Senast kontrollerat för 2 minuter sedan</small></div></div><span className="flex items-center gap-2 text-sm font-bold text-success"><span className="size-2 rounded-full bg-success" /> 3 av 3 åtgärdade</span></div><div className="grid gap-4 md:grid-cols-3">{fixes.map(({ icon: Icon, number, title, text, old }) => <article key={number} className="group border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:border-gold/60 hover:shadow-xl"><div className="mb-12 flex items-start justify-between"><div className="grid size-12 place-items-center bg-primary text-primary-foreground"><Icon /></div><span className="font-display text-5xl text-muted">{number}</span></div><h2 className="font-display text-2xl">{title}</h2><p className="mt-3 text-sm leading-relaxed text-muted-foreground">{text}</p><div className="mt-6 border-t border-border pt-4 text-xs text-muted-foreground"><span className="mb-1 block font-bold uppercase text-destructive">Åtgärdat från 3000</span><span className="line-through decoration-destructive/50">{old}</span></div></article>)}</div></div>;
+  return <div className="mx-auto max-w-[1200px] px-4 py-10 md:px-8 md:py-16"><SectionHeading eyebrow="Trygghetslöftet" title={t.securityTitle} text={t.securityIntro} /><div className="mb-7 flex flex-wrap items-center justify-between gap-4 border-y border-border py-5"><div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-full bg-success-soft text-success"><ShieldCheck /></span><div><strong className="block">Alla system skyddade</strong><small className="text-muted-foreground">Senast kontrollerat för 2 minuter sedan</small></div></div><span className="flex items-center gap-2 text-sm font-bold text-success"><span className="size-2 rounded-full bg-success" /> 3 av 3 åtgärdade</span></div><div className="grid gap-4 md:grid-cols-3">{fixes.map(({ icon: Icon, number, title, text, old }) => <article key={number} className="group border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:border-gold/60 hover:shadow-xl"><div className="mb-12 flex items-start justify-between"><div className="grid size-12 place-items-center bg-primary text-primary-foreground"><Icon /></div><span className="font-display text-5xl text-muted">{number}</span></div><h2 className="font-display text-2xl">{title}</h2><p className="mt-3 text-sm leading-relaxed text-muted-foreground">{text}</p><div className="mt-6 border-t border-border pt-4 text-xs text-muted-foreground"><span className="mb-1 block font-bold uppercase text-destructive">Åtgärdat från 3000</span><span className="line-through decoration-destructive/50">{old}</span></div></article>)}</div><div className="mt-8 grid items-center gap-6 border-2 border-gold bg-card p-6 md:grid-cols-[10rem_1fr] md:p-8"><img src={kjellPortrait} alt="Kjell bevakar hotellets säkerhetssystem" width={1200} height={912} loading="lazy" className="h-40 w-full border-2 border-gold object-cover md:h-40" /><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-gold-deep">Vakt · Säkerhetsansvarig · Fjällmaffia?</p><p className="mt-3 font-display text-2xl leading-snug md:text-3xl">Kjell är och har koll på hotellets alla olika säkerhetssystem, ingen obehörig tar sig genom varken dörren eller brandväggen och hans fällor fångar allt.</p><p className="mt-3 flex items-center gap-2 text-sm font-semibold text-muted-foreground"><Cat className="size-4 text-gold-deep" /> Rond trettioen pågår. Katten ser allt.</p></div></div></div>;
 }
 
 function Infrastructure({ t }: { t: Copy }) {
