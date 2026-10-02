@@ -308,8 +308,14 @@ function GuestServices({ t }: { t: Copy }) {
   ];
 
   const submit = () => {
-    if (service === "issue" && !issue.trim()) return toast.error("Berätta kort vad som hänt");
-    if ((service === "breakfast" || service === "issue") && !room.trim()) return toast.error("Fyll i ditt rumsnummer");
+    if (service === "issue" && !issue.trim()) {
+      toast.error("Berätta kort vad som hänt");
+      return;
+    }
+    if ((service === "breakfast" || service === "issue") && !room.trim()) {
+      toast.error("Fyll i ditt rumsnummer");
+      return;
+    }
     toast.success(service === "sauna" ? "Bastun är bokad!" : service === "breakfast" ? "Frukosten är beställd!" : "Felanmälan är mottagen!", {
       description: service === "sauna" ? `${time} för ${guests} ${guests === 1 ? "person" : "personer"}. Hildur har tänt aggregatet.` : "Receptionen bekräftar strax.",
     });
