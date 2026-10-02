@@ -1,5 +1,5 @@
 # Roadmap
 
 - [x] Presentera Kjell med porträtt och nya roller på startsidan
-- [ ] Lägg till klapp, tonfiskautomat, muta och busig bastubokningsknapp
-- [ ] Lägg till Kjells strömavbrottshot och verifiera hela upplevelsen
+- [x] Lägg till klapp, tonfiskautomat, muta och busig bastubokningsknapp
+- [x] Lägg till Kjells strömavbrottshot och verifiera hela upplevelsen
