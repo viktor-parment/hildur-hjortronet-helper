@@ -10,6 +10,8 @@ import {
   Coffee,
   Cpu,
   Flame,
+  Fish,
+  Hand,
   HeartPulse,
   Languages,
   LockKeyhole,
@@ -42,6 +44,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import kjellPortrait from "@/assets/kjell-hotel-cat.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -76,7 +79,7 @@ const copy = {
     aurora: "Norrskenslarm",
     catStatus: "Kjell, hotellkatt",
     sleepy: "Sömnig",
-    revoked: "Adminbehörighet indragen",
+    revoked: "Bastuvakt · f.d. systemadmin",
     live: "Hotellet just nu",
     servicesTitle: "Vad får det lov att vara?",
     servicesIntro: "Hildur ordnar resten. Alla beställningar gäller din nuvarande vistelse.",
@@ -94,7 +97,7 @@ const copy = {
     aurora: "Northern Lights alert",
     catStatus: "Kjell, hotel cat",
     sleepy: "Sleepy",
-    revoked: "Admin privileges revoked",
+    revoked: "Sauna guard · former sysadmin",
     live: "The hotel right now",
     servicesTitle: "What can we do for you?",
     servicesIntro: "Hildur will arrange the rest. All orders apply to your current stay.",
@@ -112,7 +115,7 @@ const copy = {
     aurora: "Guovssahas-vaaksjome",
     catStatus: "Kjell, gåetie-gaahkoe",
     sleepy: "Åerie",
-    revoked: "Admin-jearsoesvoete bååstede vaaltasovveme",
+    revoked: "Saavne-vaaksjije · ovmessie systemadmin",
     live: "Hoteelle daelie",
     servicesTitle: "Mij datne daarpesjh?",
     servicesIntro: "Hildur gaajhke öörnie. Dïenesjh dov orresem dåeriedieh.",
@@ -135,6 +138,9 @@ function HotelApp() {
   const [view, setView] = useState<View>("welcome");
   const [dark, setDark] = useState(true);
   const [catOpen, setCatOpen] = useState(false);
+  const [tunaCans, setTunaCans] = useState(0);
+  const [kjellPetted, setKjellPetted] = useState(false);
+  const [kjellBribed, setKjellBribed] = useState(false);
   const t = copy[language];
 
   return (
@@ -192,7 +198,7 @@ function HotelApp() {
 
       <main>
         {view === "welcome" && <Welcome t={t} onNavigate={setView} />}
-        {view === "services" && <GuestServices t={t} />}
+        {view === "services" && <GuestServices t={t} tunaCans={tunaCans} setTunaCans={setTunaCans} kjellPetted={kjellPetted} setKjellPetted={setKjellPetted} kjellBribed={kjellBribed} setKjellBribed={setKjellBribed} />}
         {view === "security" && <Security t={t} />}
         {view === "infra" && <Infrastructure t={t} />}
       </main>
@@ -206,20 +212,17 @@ function HotelApp() {
 
       <Dialog open={catOpen} onOpenChange={setCatOpen}>
         <DialogContent className="overflow-hidden border-gold/40 p-0 sm:max-w-md">
-          <div className="cat-stripes grid h-48 place-items-center bg-primary text-primary-foreground">
-            <div className="relative">
-              <Cat className="size-28 stroke-[1.2]" />
-              <span className="absolute -right-3 top-0 size-5 rounded-full bg-gold" />
-            </div>
+          <div className="h-56 overflow-hidden bg-primary">
+            <img src={kjellPortrait} alt="Kjell, Hotell Hjortronets långhåriga hotellkatt" width={1200} height={912} loading="lazy" className="h-full w-full object-cover object-[center_35%]" />
           </div>
           <DialogHeader className="px-6 pb-2 pt-4 text-left">
-            <DialogTitle className="font-display text-3xl">Kjell är upptagen.</DialogTitle>
+            <DialogTitle className="font-display text-3xl">Det här är Kjell.</DialogTitle>
             <DialogDescription className="text-base leading-relaxed">
-              Han genomför en mycket viktig säkerhetsrevision av en kudde i biblioteket. Beräknad återkomst: efter middagen.
+              Vakt, skadedjursbekämpare, f.d. systemadmin, terapeut, misstänkt del av fjällmaffian och bastubevakare.
             </DialogDescription>
           </DialogHeader>
           <div className="flex items-center gap-2 border-t border-border bg-muted px-6 py-4 text-xs font-semibold uppercase text-muted-foreground">
-            <LockKeyhole className="size-4" /> Adminbehörighet: fortfarande indragen
+            <Fish className="size-4" /> Ingen tonfisk, ingen bastu.
           </div>
         </DialogContent>
       </Dialog>
@@ -281,6 +284,24 @@ function Welcome({ t, onNavigate }: { t: Copy; onNavigate: (view: View) => void 
           </Button>
         </aside>
       </div>
+      <section className="mt-8 grid overflow-hidden border border-border bg-card lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="relative min-h-[320px] overflow-hidden bg-muted">
+          <img src={kjellPortrait} alt="Kjell, Hotell Hjortronets långhåriga hotellkatt" width={1200} height={912} loading="lazy" className="absolute inset-0 h-full w-full object-cover object-[center_35%]" />
+          <div className="absolute bottom-4 left-4 bg-gold px-3 py-2 text-xs font-bold uppercase text-lodge">Bastubevakning pågår</div>
+        </div>
+        <div className="p-6 md:p-10">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-gold-deep">Hotellets allt-i-allo</p>
+          <h2 className="mt-3 font-display text-4xl md:text-5xl">Det här är Kjell.</h2>
+          <p className="mt-4 max-w-xl leading-relaxed text-muted-foreground">Han håller ordning i korridorerna, lyssnar utan att döma och bevakar bastun med kompromisslös blick.</p>
+          <div className="mt-7 flex flex-wrap gap-2">
+            {["Vakt", "Skadedjursbekämpare", "F.d. systemadmin", "Terapeut", "Misstänkt fjällmaffia", "Bastubevakare"].map((role) => <span key={role} className="border border-border bg-muted px-3 py-2 text-sm font-semibold">{role}</span>)}
+          </div>
+          <div className="mt-8 flex flex-col gap-4 border-l-4 border-gold bg-gold-soft p-5 text-gold-deep sm:flex-row sm:items-center sm:justify-between">
+            <div><strong className="font-display text-2xl">Ingen tonfisk, ingen bastu.</strong><p className="mt-1 text-sm">Kjells regler är enkla. Förhandling sker vid varuautomaten.</p></div>
+            <Button variant="gold" onClick={() => onNavigate("services")}><Fish /> Besök bastun</Button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
@@ -363,7 +384,7 @@ function FormTitle({ icon: Icon, title, text }: { icon: typeof Flame; title: str
 function Security({ t }: { t: Copy }) {
   const fixes = [
     { icon: VolumeX, number: "01", title: "Inga lösenord i högtalarna", text: "Hildur säger aldrig Wi‑Fi-lösenord eller gästuppgifter högt i allmänna utrymmen.", old: "Hildur 3000 ropade gärna ut dem vid frukosten." },
-    { icon: Cat, number: "02", title: "Kjell är inte längre admin", text: "Administratörsåtkomst kräver en verifierad människa och tvåstegsverifiering.", old: "En tass på tangentbordet räcker inte längre." },
+    { icon: Cat, number: "02", title: "Kjell har bytt karriär", text: "Vakt, skadedjursbekämpare, f.d. systemadmin, terapeut och bastubevakare. Han misstänks även vara en del av fjällmaffian.", old: "Ingen tonfisk, ingen bastu." },
     { icon: LockKeyhole, number: "03", title: "Gästdata är krypterad", text: "Information är skyddad både när den skickas och när den lagras.", old: "Ingen mer gästbok.txt på skrivbordet." },
   ];
   return <div className="mx-auto max-w-[1200px] px-4 py-10 md:px-8 md:py-16"><SectionHeading eyebrow="Trygghetslöftet" title={t.securityTitle} text={t.securityIntro} /><div className="mb-7 flex flex-wrap items-center justify-between gap-4 border-y border-border py-5"><div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-full bg-success-soft text-success"><ShieldCheck /></span><div><strong className="block">Alla system skyddade</strong><small className="text-muted-foreground">Senast kontrollerat för 2 minuter sedan</small></div></div><span className="flex items-center gap-2 text-sm font-bold text-success"><span className="size-2 rounded-full bg-success" /> 3 av 3 åtgärdade</span></div><div className="grid gap-4 md:grid-cols-3">{fixes.map(({ icon: Icon, number, title, text, old }) => <article key={number} className="group border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:border-gold/60 hover:shadow-xl"><div className="mb-12 flex items-start justify-between"><div className="grid size-12 place-items-center bg-primary text-primary-foreground"><Icon /></div><span className="font-display text-5xl text-muted">{number}</span></div><h2 className="font-display text-2xl">{title}</h2><p className="mt-3 text-sm leading-relaxed text-muted-foreground">{text}</p><div className="mt-6 border-t border-border pt-4 text-xs text-muted-foreground"><span className="mb-1 block font-bold uppercase text-destructive">Åtgärdat från 3000</span><span className="line-through decoration-destructive/50">{old}</span></div></article>)}</div></div>;
