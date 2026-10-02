@@ -183,6 +183,16 @@
   background-image: repeating-linear-gradient(125deg, transparent 0 22px, color-mix(in oklab, var(--gold) 20%, transparent) 23px 42px);
 }
 
+@keyframes kjell-threat {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  45% { transform: translateY(5px) rotate(1deg); }
+  55% { transform: translateY(5px) rotate(1deg); }
+}
+
+.kjell-threat {
+  animation: kjell-threat 1.8s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
 }

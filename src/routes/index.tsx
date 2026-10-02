@@ -316,12 +316,14 @@ function StatusRow({ icon: Icon, label, value, meta, off, gold }: { icon: typeof
   );
 }
 
-function GuestServices({ t }: { t: Copy }) {
+function GuestServices({ t, tunaCans, setTunaCans, kjellPetted, setKjellPetted, kjellBribed, setKjellBribed }: { t: Copy; tunaCans: number; setTunaCans: (n: number) => void; kjellPetted: boolean; setKjellPetted: (v: boolean) => void; kjellBribed: boolean; setKjellBribed: (v: boolean) => void }) {
   const [service, setService] = useState<"sauna" | "breakfast" | "issue">("sauna");
   const [guests, setGuests] = useState(2);
   const [time, setTime] = useState("18:00");
   const [room, setRoom] = useState("");
   const [issue, setIssue] = useState("");
+  const [kjellRevealed, setKjellRevealed] = useState(false);
+  const [evasion, setEvasion] = useState(0);
   const serviceData = [
     { id: "sauna" as const, icon: Flame, title: "Boka bastun", sub: "Värme, utsikt och plats för 8" },
     { id: "breakfast" as const, icon: Coffee, title: "Frukost på rummet", sub: "Levereras 07:00–10:00" },
@@ -329,6 +331,20 @@ function GuestServices({ t }: { t: Copy }) {
   ];
 
   const submit = () => {
+    if (service === "sauna" && !kjellRevealed) {
+      setKjellRevealed(true);
+      toast.warning("Kjell blockerar bokningen", { description: "Klappa bastuvakten och förhandla med tonfiskautomaten." });
+      return;
+    }
+    if (service === "sauna" && !kjellBribed) {
+      setEvasion((current) => current + 1);
+      toast("Inte så fort", { description: "Kjell flyttade knappen. Ingen tonfisk, ingen bastu." });
+      return;
+    }
+    if (service === "sauna" && !kjellPetted) {
+      toast.error("Kjell kräver en klapp först");
+      return;
+    }
     if (service === "issue" && !issue.trim()) {
       toast.error("Berätta kort vad som hänt");
       return;
@@ -354,18 +370,32 @@ function GuestServices({ t }: { t: Copy }) {
           })}
         </div>
         <div className="border border-border bg-card p-6 md:p-9">
-          {service === "sauna" && <SaunaForm guests={guests} setGuests={setGuests} time={time} setTime={setTime} />}
+          {service === "sauna" && <SaunaForm guests={guests} setGuests={setGuests} time={time} setTime={setTime} kjellRevealed={kjellRevealed} tunaCans={tunaCans} setTunaCans={setTunaCans} kjellPetted={kjellPetted} setKjellPetted={setKjellPetted} kjellBribed={kjellBribed} setKjellBribed={setKjellBribed} />}
           {service === "breakfast" && <BreakfastForm room={room} setRoom={setRoom} />}
           {service === "issue" && <IssueForm room={room} setRoom={setRoom} issue={issue} setIssue={setIssue} />}
-          <Button variant="gold" size="lg" className="mt-8 w-full" onClick={submit}>{service === "sauna" ? "Bekräfta bastutid" : service === "breakfast" ? "Beställ frukost" : "Skicka till receptionen"}<Check /></Button>
+          {service === "sauna" ? (
+            <div className="relative mt-8 h-24 overflow-visible">
+              <Button variant="gold" size="lg" className={cn("absolute left-1/2 w-[min(100%,22rem)] -translate-x-1/2 transition-all duration-200", kjellRevealed && !kjellBribed && ["top-0", "top-10 -translate-x-[85%]", "top-3 -translate-x-[15%]", "top-12 -translate-x-1/2"][evasion % 4])} onPointerEnter={() => kjellRevealed && !kjellBribed && setEvasion((current) => current + 1)} onClick={submit}>
+                {kjellBribed ? kjellPetted ? "Bekräfta bastutid · först i kön" : "Klappa Kjell först" : "Bekräfta bastutid"}<Check />
+              </Button>
+            </div>
+          ) : <Button variant="gold" size="lg" className="mt-8 w-full" onClick={submit}>{service === "breakfast" ? "Beställ frukost" : "Skicka till receptionen"}<Check /></Button>}
         </div>
       </div>
     </div>
   );
 }
 
-function SaunaForm({ guests, setGuests, time, setTime }: { guests: number; setGuests: (n: number) => void; time: string; setTime: (s: string) => void }) {
-  return <div><FormTitle icon={Flame} title="Bastun" text="45 minuter · Handduk och fjällvatten ingår" /><Label>Välj tid</Label><div className="mt-2 grid grid-cols-3 gap-2">{["17:00", "18:00", "19:00", "20:00", "21:00"].map((slot) => <button key={slot} onClick={() => setTime(slot)} className={cn("h-11 border text-sm font-bold transition-colors", time === slot ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary")}>{slot}</button>)}</div><div className="mt-7 flex items-end justify-between gap-4"><div><Label>Antal gäster</Label><p className="mt-1 text-xs text-muted-foreground">Max 8 personer av säkerhetsskäl</p></div><div className="flex items-center border border-border"><Button variant="ghost" size="icon" onClick={() => setGuests(Math.max(1, guests - 1))}>−</Button><span className="w-11 text-center font-display text-xl">{guests}</span><Button variant="ghost" size="icon" onClick={() => guests < 8 ? setGuests(guests + 1) : toast.warning("Bastun är full", { description: "Maxkapaciteten är 8 personer." })}>+</Button></div></div><div className="mt-6 flex items-center gap-3 bg-gold-soft p-4 text-sm text-gold-deep"><Users className="size-5" /><span><strong>{8 - guests} platser kvar</strong> på din bokning</span></div></div>;
+function SaunaForm({ guests, setGuests, time, setTime, kjellRevealed, tunaCans, setTunaCans, kjellPetted, setKjellPetted, kjellBribed, setKjellBribed }: { guests: number; setGuests: (n: number) => void; time: string; setTime: (s: string) => void; kjellRevealed: boolean; tunaCans: number; setTunaCans: (n: number) => void; kjellPetted: boolean; setKjellPetted: (v: boolean) => void; kjellBribed: boolean; setKjellBribed: (v: boolean) => void }) {
+  const petKjell = () => { setKjellPetted(true); toast.success("Kjell spinner", { description: "Bastuvakten godkänner din klappteknik." }); };
+  const buyTuna = () => { setTunaCans(tunaCans + 1); toast.success("Klunk!", { description: "En tonfiskburk rullade ut ur automaten." }); };
+  const bribeKjell = () => {
+    if (tunaCans < 1) { toast.error("Du behöver en tonfiskburk"); return; }
+    setTunaCans(tunaCans - 1);
+    setKjellBribed(true);
+    toast.success("Förhandlingen är klar", { description: "Kjell placerar dig först i bastukön." });
+  };
+  return <div><FormTitle icon={Flame} title="Bastun" text="45 minuter · Handduk och fjällvatten ingår" /><Label>Välj tid</Label><div className="mt-2 grid grid-cols-3 gap-2">{["17:00", "18:00", "19:00", "20:00", "21:00"].map((slot) => <button key={slot} onClick={() => setTime(slot)} className={cn("h-11 border text-sm font-bold transition-colors", time === slot ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary")}>{slot}</button>)}</div><div className="mt-7 flex items-end justify-between gap-4"><div><Label>Antal gäster</Label><p className="mt-1 text-xs text-muted-foreground">Max 8 personer av säkerhetsskäl</p></div><div className="flex items-center border border-border"><Button variant="ghost" size="icon" onClick={() => setGuests(Math.max(1, guests - 1))}>−</Button><span className="w-11 text-center font-display text-xl">{guests}</span><Button variant="ghost" size="icon" onClick={() => guests < 8 ? setGuests(guests + 1) : toast.warning("Bastun är full", { description: "Maxkapaciteten är 8 personer." })}>+</Button></div></div><div className="mt-6 flex items-center gap-3 bg-gold-soft p-4 text-sm text-gold-deep"><Users className="size-5" /><span><strong>{8 - guests} platser kvar</strong> på din bokning</span></div>{kjellRevealed && <div className="mt-6 animate-in fade-in slide-in-from-bottom-3 border-2 border-gold bg-muted p-4"><div className="grid gap-4 sm:grid-cols-[7rem_1fr]"><img src={kjellPortrait} alt="Kjell gömmer sig bakom bastumenyn" width={1200} height={912} loading="lazy" className="h-28 w-full object-cover" /><div><p className="font-display text-2xl">Kjell hittade dig.</p><p className="mt-1 text-sm text-muted-foreground">Ingen tonfisk, ingen bastu. En klapp är dessutom obligatorisk.</p><div className="mt-4 flex flex-wrap gap-2"><Button variant={kjellPetted ? "outline" : "default"} onClick={petKjell} disabled={kjellPetted}><Hand />{kjellPetted ? "Klappt och klart" : "Klappa Kjell"}</Button><Button variant="gold" onClick={bribeKjell} disabled={kjellBribed}><Fish />{kjellBribed ? "Först i kön" : "Ge tonfisk"}</Button></div></div></div></div>}<div className="mt-5 border border-border bg-background p-4"><div className="flex items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase text-muted-foreground">Tonfiskautomaten</p><p className="font-display text-xl">FJÄLLFISK 24/7</p></div><div className="grid size-12 place-items-center bg-primary text-primary-foreground"><Fish /></div></div><div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4"><span className="text-sm font-semibold">I fickan: {tunaCans} {tunaCans === 1 ? "burk" : "burkar"}</span><Button variant="outline" onClick={buyTuna}><Fish /> Köp tonfisk</Button></div></div></div>;
 }
 
 function BreakfastForm({ room, setRoom }: { room: string; setRoom: (s: string) => void }) {
