@@ -10,6 +10,8 @@ import {
   Coffee,
   Cpu,
   Flame,
+  Fish,
+  Hand,
   HeartPulse,
   Languages,
   LockKeyhole,
@@ -42,6 +44,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import kjellPortrait from "@/assets/kjell-hotel-cat.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -76,7 +79,7 @@ const copy = {
     aurora: "Norrskenslarm",
     catStatus: "Kjell, hotellkatt",
     sleepy: "Sömnig",
-    revoked: "Adminbehörighet indragen",
+    revoked: "Bastuvakt · f.d. systemadmin",
     live: "Hotellet just nu",
     servicesTitle: "Vad får det lov att vara?",
     servicesIntro: "Hildur ordnar resten. Alla beställningar gäller din nuvarande vistelse.",
@@ -94,7 +97,7 @@ const copy = {
     aurora: "Northern Lights alert",
     catStatus: "Kjell, hotel cat",
     sleepy: "Sleepy",
-    revoked: "Admin privileges revoked",
+    revoked: "Sauna guard · former sysadmin",
     live: "The hotel right now",
     servicesTitle: "What can we do for you?",
     servicesIntro: "Hildur will arrange the rest. All orders apply to your current stay.",
@@ -112,7 +115,7 @@ const copy = {
     aurora: "Guovssahas-vaaksjome",
     catStatus: "Kjell, gåetie-gaahkoe",
     sleepy: "Åerie",
-    revoked: "Admin-jearsoesvoete bååstede vaaltasovveme",
+    revoked: "Saavne-vaaksjije · ovmessie systemadmin",
     live: "Hoteelle daelie",
     servicesTitle: "Mij datne daarpesjh?",
     servicesIntro: "Hildur gaajhke öörnie. Dïenesjh dov orresem dåeriedieh.",
@@ -135,6 +138,9 @@ function HotelApp() {
   const [view, setView] = useState<View>("welcome");
   const [dark, setDark] = useState(true);
   const [catOpen, setCatOpen] = useState(false);
+  const [tunaCans, setTunaCans] = useState(0);
+  const [kjellPetted, setKjellPetted] = useState(false);
+  const [kjellBribed, setKjellBribed] = useState(false);
   const t = copy[language];
 
   return (
@@ -192,7 +198,7 @@ function HotelApp() {
 
       <main>
         {view === "welcome" && <Welcome t={t} onNavigate={setView} />}
-        {view === "services" && <GuestServices t={t} />}
+        {view === "services" && <GuestServices t={t} tunaCans={tunaCans} setTunaCans={setTunaCans} kjellPetted={kjellPetted} setKjellPetted={setKjellPetted} kjellBribed={kjellBribed} setKjellBribed={setKjellBribed} />}
         {view === "security" && <Security t={t} />}
         {view === "infra" && <Infrastructure t={t} />}
       </main>
@@ -206,20 +212,17 @@ function HotelApp() {
 
       <Dialog open={catOpen} onOpenChange={setCatOpen}>
         <DialogContent className="overflow-hidden border-gold/40 p-0 sm:max-w-md">
-          <div className="cat-stripes grid h-48 place-items-center bg-primary text-primary-foreground">
-            <div className="relative">
-              <Cat className="size-28 stroke-[1.2]" />
-              <span className="absolute -right-3 top-0 size-5 rounded-full bg-gold" />
-            </div>
+          <div className="h-56 overflow-hidden bg-primary">
+            <img src={kjellPortrait} alt="Kjell, Hotell Hjortronets långhåriga hotellkatt" width={1200} height={912} loading="lazy" className="h-full w-full object-cover object-[center_35%]" />
           </div>
           <DialogHeader className="px-6 pb-2 pt-4 text-left">
-            <DialogTitle className="font-display text-3xl">Kjell är upptagen.</DialogTitle>
+            <DialogTitle className="font-display text-3xl">Det här är Kjell.</DialogTitle>
             <DialogDescription className="text-base leading-relaxed">
-              Han genomför en mycket viktig säkerhetsrevision av en kudde i biblioteket. Beräknad återkomst: efter middagen.
+              Vakt, skadedjursbekämpare, f.d. systemadmin, terapeut, misstänkt del av fjällmaffian och bastubevakare.
             </DialogDescription>
           </DialogHeader>
           <div className="flex items-center gap-2 border-t border-border bg-muted px-6 py-4 text-xs font-semibold uppercase text-muted-foreground">
-            <LockKeyhole className="size-4" /> Adminbehörighet: fortfarande indragen
+            <Fish className="size-4" /> Ingen tonfisk, ingen bastu.
           </div>
         </DialogContent>
       </Dialog>
@@ -281,6 +284,24 @@ function Welcome({ t, onNavigate }: { t: Copy; onNavigate: (view: View) => void 
           </Button>
         </aside>
       </div>
+      <section className="mt-8 grid overflow-hidden border border-border bg-card lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="relative min-h-[320px] overflow-hidden bg-muted">
+          <img src={kjellPortrait} alt="Kjell, Hotell Hjortronets långhåriga hotellkatt" width={1200} height={912} loading="lazy" className="absolute inset-0 h-full w-full object-cover object-[center_35%]" />
+          <div className="absolute bottom-4 left-4 bg-gold px-3 py-2 text-xs font-bold uppercase text-lodge">Bastubevakning pågår</div>
+        </div>
+        <div className="p-6 md:p-10">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-gold-deep">Hotellets allt-i-allo</p>
+          <h2 className="mt-3 font-display text-4xl md:text-5xl">Det här är Kjell.</h2>
+          <p className="mt-4 max-w-xl leading-relaxed text-muted-foreground">Han håller ordning i korridorerna, lyssnar utan att döma och bevakar bastun med kompromisslös blick.</p>
+          <div className="mt-7 flex flex-wrap gap-2">
+            {["Vakt", "Skadedjursbekämpare", "F.d. systemadmin", "Terapeut", "Misstänkt fjällmaffia", "Bastubevakare"].map((role) => <span key={role} className="border border-border bg-muted px-3 py-2 text-sm font-semibold">{role}</span>)}
+          </div>
+          <div className="mt-8 flex flex-col gap-4 border-l-4 border-gold bg-gold-soft p-5 text-gold-deep sm:flex-row sm:items-center sm:justify-between">
+            <div><strong className="font-display text-2xl">Ingen tonfisk, ingen bastu.</strong><p className="mt-1 text-sm">Kjells regler är enkla. Förhandling sker vid varuautomaten.</p></div>
+            <Button variant="gold" onClick={() => onNavigate("services")}><Fish /> Besök bastun</Button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
@@ -295,12 +316,14 @@ function StatusRow({ icon: Icon, label, value, meta, off, gold }: { icon: typeof
   );
 }
 
-function GuestServices({ t }: { t: Copy }) {
+function GuestServices({ t, tunaCans, setTunaCans, kjellPetted, setKjellPetted, kjellBribed, setKjellBribed }: { t: Copy; tunaCans: number; setTunaCans: (n: number) => void; kjellPetted: boolean; setKjellPetted: (v: boolean) => void; kjellBribed: boolean; setKjellBribed: (v: boolean) => void }) {
   const [service, setService] = useState<"sauna" | "breakfast" | "issue">("sauna");
   const [guests, setGuests] = useState(2);
   const [time, setTime] = useState("18:00");
   const [room, setRoom] = useState("");
   const [issue, setIssue] = useState("");
+  const [kjellRevealed, setKjellRevealed] = useState(false);
+  const [evasion, setEvasion] = useState(0);
   const serviceData = [
     { id: "sauna" as const, icon: Flame, title: "Boka bastun", sub: "Värme, utsikt och plats för 8" },
     { id: "breakfast" as const, icon: Coffee, title: "Frukost på rummet", sub: "Levereras 07:00–10:00" },
@@ -308,6 +331,20 @@ function GuestServices({ t }: { t: Copy }) {
   ];
 
   const submit = () => {
+    if (service === "sauna" && !kjellRevealed) {
+      setKjellRevealed(true);
+      toast.warning("Kjell blockerar bokningen", { description: "Klappa bastuvakten och förhandla med tonfiskautomaten." });
+      return;
+    }
+    if (service === "sauna" && !kjellBribed) {
+      setEvasion((current) => current + 1);
+      toast("Inte så fort", { description: "Kjell flyttade knappen. Ingen tonfisk, ingen bastu." });
+      return;
+    }
+    if (service === "sauna" && !kjellPetted) {
+      toast.error("Kjell kräver en klapp först");
+      return;
+    }
     if (service === "issue" && !issue.trim()) {
       toast.error("Berätta kort vad som hänt");
       return;
@@ -333,18 +370,32 @@ function GuestServices({ t }: { t: Copy }) {
           })}
         </div>
         <div className="border border-border bg-card p-6 md:p-9">
-          {service === "sauna" && <SaunaForm guests={guests} setGuests={setGuests} time={time} setTime={setTime} />}
+          {service === "sauna" && <SaunaForm guests={guests} setGuests={setGuests} time={time} setTime={setTime} kjellRevealed={kjellRevealed} tunaCans={tunaCans} setTunaCans={setTunaCans} kjellPetted={kjellPetted} setKjellPetted={setKjellPetted} kjellBribed={kjellBribed} setKjellBribed={setKjellBribed} />}
           {service === "breakfast" && <BreakfastForm room={room} setRoom={setRoom} />}
           {service === "issue" && <IssueForm room={room} setRoom={setRoom} issue={issue} setIssue={setIssue} />}
-          <Button variant="gold" size="lg" className="mt-8 w-full" onClick={submit}>{service === "sauna" ? "Bekräfta bastutid" : service === "breakfast" ? "Beställ frukost" : "Skicka till receptionen"}<Check /></Button>
+          {service === "sauna" ? (
+            <div className="relative mt-8 h-24 overflow-visible">
+              <Button variant="gold" size="lg" className={cn("absolute left-1/2 w-[min(100%,22rem)] -translate-x-1/2 transition-all duration-200", kjellRevealed && !kjellBribed && ["top-0", "top-10 -translate-x-[85%]", "top-3 -translate-x-[15%]", "top-12 -translate-x-1/2"][evasion % 4])} onPointerEnter={() => kjellRevealed && !kjellBribed && setEvasion((current) => current + 1)} onClick={submit}>
+                {kjellBribed ? kjellPetted ? "Bekräfta bastutid · först i kön" : "Klappa Kjell först" : "Bekräfta bastutid"}<Check />
+              </Button>
+            </div>
+          ) : <Button variant="gold" size="lg" className="mt-8 w-full" onClick={submit}>{service === "breakfast" ? "Beställ frukost" : "Skicka till receptionen"}<Check /></Button>}
         </div>
       </div>
     </div>
   );
 }
 
-function SaunaForm({ guests, setGuests, time, setTime }: { guests: number; setGuests: (n: number) => void; time: string; setTime: (s: string) => void }) {
-  return <div><FormTitle icon={Flame} title="Bastun" text="45 minuter · Handduk och fjällvatten ingår" /><Label>Välj tid</Label><div className="mt-2 grid grid-cols-3 gap-2">{["17:00", "18:00", "19:00", "20:00", "21:00"].map((slot) => <button key={slot} onClick={() => setTime(slot)} className={cn("h-11 border text-sm font-bold transition-colors", time === slot ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary")}>{slot}</button>)}</div><div className="mt-7 flex items-end justify-between gap-4"><div><Label>Antal gäster</Label><p className="mt-1 text-xs text-muted-foreground">Max 8 personer av säkerhetsskäl</p></div><div className="flex items-center border border-border"><Button variant="ghost" size="icon" onClick={() => setGuests(Math.max(1, guests - 1))}>−</Button><span className="w-11 text-center font-display text-xl">{guests}</span><Button variant="ghost" size="icon" onClick={() => guests < 8 ? setGuests(guests + 1) : toast.warning("Bastun är full", { description: "Maxkapaciteten är 8 personer." })}>+</Button></div></div><div className="mt-6 flex items-center gap-3 bg-gold-soft p-4 text-sm text-gold-deep"><Users className="size-5" /><span><strong>{8 - guests} platser kvar</strong> på din bokning</span></div></div>;
+function SaunaForm({ guests, setGuests, time, setTime, kjellRevealed, tunaCans, setTunaCans, kjellPetted, setKjellPetted, kjellBribed, setKjellBribed }: { guests: number; setGuests: (n: number) => void; time: string; setTime: (s: string) => void; kjellRevealed: boolean; tunaCans: number; setTunaCans: (n: number) => void; kjellPetted: boolean; setKjellPetted: (v: boolean) => void; kjellBribed: boolean; setKjellBribed: (v: boolean) => void }) {
+  const petKjell = () => { setKjellPetted(true); toast.success("Kjell spinner", { description: "Bastuvakten godkänner din klappteknik." }); };
+  const buyTuna = () => { setTunaCans(tunaCans + 1); toast.success("Klunk!", { description: "En tonfiskburk rullade ut ur automaten." }); };
+  const bribeKjell = () => {
+    if (tunaCans < 1) { toast.error("Du behöver en tonfiskburk"); return; }
+    setTunaCans(tunaCans - 1);
+    setKjellBribed(true);
+    toast.success("Förhandlingen är klar", { description: "Kjell placerar dig först i bastukön." });
+  };
+  return <div><FormTitle icon={Flame} title="Bastun" text="45 minuter · Handduk och fjällvatten ingår" /><Label>Välj tid</Label><div className="mt-2 grid grid-cols-3 gap-2">{["17:00", "18:00", "19:00", "20:00", "21:00"].map((slot) => <button key={slot} onClick={() => setTime(slot)} className={cn("h-11 border text-sm font-bold transition-colors", time === slot ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary")}>{slot}</button>)}</div><div className="mt-7 flex items-end justify-between gap-4"><div><Label>Antal gäster</Label><p className="mt-1 text-xs text-muted-foreground">Max 8 personer av säkerhetsskäl</p></div><div className="flex items-center border border-border"><Button variant="ghost" size="icon" onClick={() => setGuests(Math.max(1, guests - 1))}>−</Button><span className="w-11 text-center font-display text-xl">{guests}</span><Button variant="ghost" size="icon" onClick={() => guests < 8 ? setGuests(guests + 1) : toast.warning("Bastun är full", { description: "Maxkapaciteten är 8 personer." })}>+</Button></div></div><div className="mt-6 flex items-center gap-3 bg-gold-soft p-4 text-sm text-gold-deep"><Users className="size-5" /><span><strong>{8 - guests} platser kvar</strong> på din bokning</span></div>{kjellRevealed && <div className="mt-6 animate-in fade-in slide-in-from-bottom-3 border-2 border-gold bg-muted p-4"><div className="grid gap-4 sm:grid-cols-[7rem_1fr]"><img src={kjellPortrait} alt="Kjell gömmer sig bakom bastumenyn" width={1200} height={912} loading="lazy" className="h-28 w-full object-cover" /><div><p className="font-display text-2xl">Kjell hittade dig.</p><p className="mt-1 text-sm text-muted-foreground">Ingen tonfisk, ingen bastu. En klapp är dessutom obligatorisk.</p><div className="mt-4 flex flex-wrap gap-2"><Button variant={kjellPetted ? "outline" : "default"} onClick={petKjell} disabled={kjellPetted}><Hand />{kjellPetted ? "Klappt och klart" : "Klappa Kjell"}</Button><Button variant="gold" onClick={bribeKjell} disabled={kjellBribed}><Fish />{kjellBribed ? "Först i kön" : "Ge tonfisk"}</Button></div></div></div></div>}<div className="mt-5 border border-border bg-background p-4"><div className="flex items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase text-muted-foreground">Tonfiskautomaten</p><p className="font-display text-xl">FJÄLLFISK 24/7</p></div><div className="grid size-12 place-items-center bg-primary text-primary-foreground"><Fish /></div></div><div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4"><span className="text-sm font-semibold">I fickan: {tunaCans} {tunaCans === 1 ? "burk" : "burkar"}</span><Button variant="outline" onClick={buyTuna}><Fish /> Köp tonfisk</Button></div></div></div>;
 }
 
 function BreakfastForm({ room, setRoom }: { room: string; setRoom: (s: string) => void }) {
@@ -363,7 +414,7 @@ function FormTitle({ icon: Icon, title, text }: { icon: typeof Flame; title: str
 function Security({ t }: { t: Copy }) {
   const fixes = [
     { icon: VolumeX, number: "01", title: "Inga lösenord i högtalarna", text: "Hildur säger aldrig Wi‑Fi-lösenord eller gästuppgifter högt i allmänna utrymmen.", old: "Hildur 3000 ropade gärna ut dem vid frukosten." },
-    { icon: Cat, number: "02", title: "Kjell är inte längre admin", text: "Administratörsåtkomst kräver en verifierad människa och tvåstegsverifiering.", old: "En tass på tangentbordet räcker inte längre." },
+    { icon: Cat, number: "02", title: "Kjell har bytt karriär", text: "Vakt, skadedjursbekämpare, f.d. systemadmin, terapeut och bastubevakare. Han misstänks även vara en del av fjällmaffian.", old: "Ingen tonfisk, ingen bastu." },
     { icon: LockKeyhole, number: "03", title: "Gästdata är krypterad", text: "Information är skyddad både när den skickas och när den lagras.", old: "Ingen mer gästbok.txt på skrivbordet." },
   ];
   return <div className="mx-auto max-w-[1200px] px-4 py-10 md:px-8 md:py-16"><SectionHeading eyebrow="Trygghetslöftet" title={t.securityTitle} text={t.securityIntro} /><div className="mb-7 flex flex-wrap items-center justify-between gap-4 border-y border-border py-5"><div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-full bg-success-soft text-success"><ShieldCheck /></span><div><strong className="block">Alla system skyddade</strong><small className="text-muted-foreground">Senast kontrollerat för 2 minuter sedan</small></div></div><span className="flex items-center gap-2 text-sm font-bold text-success"><span className="size-2 rounded-full bg-success" /> 3 av 3 åtgärdade</span></div><div className="grid gap-4 md:grid-cols-3">{fixes.map(({ icon: Icon, number, title, text, old }) => <article key={number} className="group border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:border-gold/60 hover:shadow-xl"><div className="mb-12 flex items-start justify-between"><div className="grid size-12 place-items-center bg-primary text-primary-foreground"><Icon /></div><span className="font-display text-5xl text-muted">{number}</span></div><h2 className="font-display text-2xl">{title}</h2><p className="mt-3 text-sm leading-relaxed text-muted-foreground">{text}</p><div className="mt-6 border-t border-border pt-4 text-xs text-muted-foreground"><span className="mb-1 block font-bold uppercase text-destructive">Åtgärdat från 3000</span><span className="line-through decoration-destructive/50">{old}</span></div></article>)}</div></div>;
@@ -377,5 +428,5 @@ function Infrastructure({ t }: { t: Copy }) {
     { icon: Radio, label: "Hotell Hjortronet", detail: "Krypterad anslutning", status: statuses[1] },
     { icon: Cpu, label: "Raspberry Pi", detail: "Lokal reserv · Receptionen", status: statuses[2] },
   ];
-  return <div className="mx-auto max-w-[1200px] px-4 py-10 md:px-8 md:py-16"><div className="flex flex-col justify-between gap-6 md:flex-row md:items-end"><SectionHeading eyebrow="Drift & infrastruktur" title={t.infraTitle} text={t.infraIntro} /><Button variant={powerOut ? "destructive" : "outline"} size="lg" onClick={() => { setPowerOut(!powerOut); toast(powerOut ? "Strömmen är tillbaka" : "Simulerat strömavbrott", { description: powerOut ? "Molndriften synkar igen." : "Raspberry Pi-reserven tar över lokalt." }); }}><Power />{powerOut ? "Återställ ström" : "Testa strömavbrott"}</Button></div><div className="relative mt-4 border border-border bg-card p-6 md:p-10"><div className="grid gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:items-center">{nodes.map(({ icon: Icon, label, detail, status }, index) => <div key={label} className="contents"><article className={cn("relative border p-6 text-center transition-all", status === "Offline" ? "border-destructive/40 bg-destructive/5 opacity-55" : status === "Aktiv reserv" ? "border-gold bg-gold-soft" : "border-border bg-background")}><div className="mx-auto mb-5 grid size-14 place-items-center bg-primary text-primary-foreground"><Icon className="size-7" /></div><h2 className="font-display text-xl">{label}</h2><p className="mt-2 text-xs text-muted-foreground">{detail}</p><span className={cn("mt-5 inline-flex items-center gap-2 text-xs font-bold uppercase", status === "Offline" ? "text-destructive" : "text-success")}><span className="size-2 rounded-full bg-current" />{status}</span></article>{index < nodes.length - 1 && <div className="flex items-center justify-center text-muted-foreground"><div className="h-px flex-1 bg-border md:h-20 md:w-px md:flex-none" /><ChevronRight className="size-5 rotate-90 md:rotate-0" /></div>}</div>)}</div><div className="mt-8 flex gap-3 border-l-4 border-gold bg-gold-soft p-5 text-gold-deep"><ThermometerSun className="mt-0.5 size-5 shrink-0" /><p className="text-sm leading-relaxed"><strong>Bastun är nu bara en bastu.</strong> Hildur 3000:s server stod tidigare under lavarna. Hildur 4.0 körs svalt, säkert och med lokal reservkraft.</p></div>{powerOut && <div className="mt-4 flex items-center gap-3 border border-success/30 bg-success-soft p-4 text-sm text-success"><WifiOff className="size-5" /><strong>Reservläge aktivt:</strong> dörrlås, brandlarm och reception fungerar lokalt.</div>}</div></div>;
+  return <div className="mx-auto max-w-[1200px] px-4 py-10 md:px-8 md:py-16"><div className="flex flex-col justify-between gap-6 md:flex-row md:items-end"><SectionHeading eyebrow="Drift & infrastruktur" title={t.infraTitle} text={t.infraIntro} /><div className="relative mt-20 self-start md:self-auto"><div className="kjell-threat pointer-events-none absolute -right-2 -top-20 z-10 flex items-end"><div className="mb-8 max-w-36 border border-gold bg-background px-3 py-2 text-xs font-bold shadow-lg">Tryck då. Jag vågar dig.</div><img src={kjellPortrait} alt="Kjell vakar över strömavbrottsknappen" width={1200} height={912} loading="lazy" className="h-24 w-24 border-2 border-gold object-cover" /></div><Button variant={powerOut ? "destructive" : "outline"} size="lg" onClick={() => { setPowerOut(!powerOut); toast(powerOut ? "Strömmen är tillbaka" : "Simulerat strömavbrott", { description: powerOut ? "Molndriften synkar igen." : "Raspberry Pi-reserven tar över lokalt. Kjell ser nöjd ut." }); }}><Power />{powerOut ? "Återställ ström" : "Testa strömavbrott"}</Button></div></div><div className="relative mt-4 border border-border bg-card p-6 md:p-10"><div className="grid gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:items-center">{nodes.map(({ icon: Icon, label, detail, status }, index) => <div key={label} className="contents"><article className={cn("relative border p-6 text-center transition-all", status === "Offline" ? "border-destructive/40 bg-destructive/5 opacity-55" : status === "Aktiv reserv" ? "border-gold bg-gold-soft" : "border-border bg-background")}><div className="mx-auto mb-5 grid size-14 place-items-center bg-primary text-primary-foreground"><Icon className="size-7" /></div><h2 className="font-display text-xl">{label}</h2><p className="mt-2 text-xs text-muted-foreground">{detail}</p><span className={cn("mt-5 inline-flex items-center gap-2 text-xs font-bold uppercase", status === "Offline" ? "text-destructive" : "text-success")}><span className="size-2 rounded-full bg-current" />{status}</span></article>{index < nodes.length - 1 && <div className="flex items-center justify-center text-muted-foreground"><div className="h-px flex-1 bg-border md:h-20 md:w-px md:flex-none" /><ChevronRight className="size-5 rotate-90 md:rotate-0" /></div>}</div>)}</div><div className="mt-8 flex gap-3 border-l-4 border-gold bg-gold-soft p-5 text-gold-deep"><ThermometerSun className="mt-0.5 size-5 shrink-0" /><p className="text-sm leading-relaxed"><strong>Bastun är nu bara en bastu.</strong> Hildur 3000:s server stod tidigare under lavarna. Hildur 4.0 körs svalt, säkert och med lokal reservkraft.</p></div>{powerOut && <div className="mt-4 flex items-center gap-3 border border-success/30 bg-success-soft p-4 text-sm text-success"><WifiOff className="size-5" /><strong>Reservläge aktivt:</strong> dörrlås, brandlarm och reception fungerar lokalt.</div>}</div></div>;
 }
